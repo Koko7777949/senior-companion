@@ -1,0 +1,612 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.2.0
+  description: Senior Companion — Hospital & Personal Care API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: profile
+    description: Patient profile
+  - name: reminders
+    description: Medication reminders
+  - name: family
+    description: Family contacts
+  - name: alerts
+    description: Emergency alerts
+  - name: devices
+    description: IoT device sensors
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get patient profile
+      responses:
+        "200":
+          description: Patient profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientProfile"
+    put:
+      operationId: updateProfile
+      tags: [profile]
+      summary: Update patient profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileInput"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientProfile"
+
+  /reminders:
+    get:
+      operationId: getReminders
+      tags: [reminders]
+      summary: Get all reminders
+      responses:
+        "200":
+          description: List of reminders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reminder"
+    post:
+      operationId: createReminder
+      tags: [reminders]
+      summary: Create a reminder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReminderInput"
+      responses:
+        "201":
+          description: Created reminder
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reminder"
+
+  /reminders/{id}:
+    put:
+      operationId: updateReminder
+      tags: [reminders]
+      summary: Update a reminder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReminderInput"
+      responses:
+        "200":
+          description: Updated reminder
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reminder"
+    delete:
+      operationId: deleteReminder
+      tags: [reminders]
+      summary: Delete a reminder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /reminders/{id}/taken:
+    post:
+      operationId: markReminderTaken
+      tags: [reminders]
+      summary: Mark a reminder's dose as taken today
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Log entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedicationLog"
+
+  /medication-logs/today:
+    get:
+      operationId: getTodayLogs
+      tags: [reminders]
+      summary: Get today's medication log
+      responses:
+        "200":
+          description: Today's medication logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MedicationLog"
+
+  /family:
+    get:
+      operationId: getFamilyContacts
+      tags: [family]
+      summary: Get all family contacts
+      responses:
+        "200":
+          description: List of family contacts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FamilyContact"
+    post:
+      operationId: createFamilyContact
+      tags: [family]
+      summary: Create a family contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFamilyContactInput"
+      responses:
+        "201":
+          description: Created contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FamilyContact"
+
+  /family/{id}:
+    delete:
+      operationId: deleteFamilyContact
+      tags: [family]
+      summary: Delete a family contact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /alerts:
+    get:
+      operationId: getAlerts
+      tags: [alerts]
+      summary: Get all alerts
+      responses:
+        "200":
+          description: List of alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+    post:
+      operationId: createAlert
+      tags: [alerts]
+      summary: Send an emergency alert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAlertInput"
+      responses:
+        "201":
+          description: Alert sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}/resolve:
+    patch:
+      operationId: resolveAlert
+      tags: [alerts]
+      summary: Mark an alert as resolved
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Resolved alert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /devices:
+    get:
+      operationId: getDevices
+      tags: [devices]
+      summary: Get all IoT devices
+      responses:
+        "200":
+          description: List of devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Device"
+    post:
+      operationId: createDevice
+      tags: [devices]
+      summary: Register a device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeviceInput"
+      responses:
+        "201":
+          description: Created device
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+
+  /devices/{id}:
+    delete:
+      operationId: deleteDevice
+      tags: [devices]
+      summary: Remove a device
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /devices/{id}/readings:
+    get:
+      operationId: getDeviceReadings
+      tags: [devices]
+      summary: Get latest readings for a device
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of readings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeviceReading"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    PatientProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        age:
+          type: integer
+        bloodType:
+          type: string
+          enum: [A+, A-, B+, B-, O+, O-, AB+, AB-]
+        roomNumber:
+          type: string
+        doctorName:
+          type: string
+        conditions:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - fullName
+        - age
+        - bloodType
+        - conditions
+        - updatedAt
+
+    UpdateProfileInput:
+      type: object
+      properties:
+        fullName:
+          type: string
+        age:
+          type: integer
+        bloodType:
+          type: string
+          enum: [A+, A-, B+, B-, O+, O-, AB+, AB-]
+        roomNumber:
+          type: string
+        doctorName:
+          type: string
+        conditions:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+      required:
+        - fullName
+        - age
+        - bloodType
+        - conditions
+
+    MedicationLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        reminderId:
+          type: integer
+        date:
+          type: string
+        status:
+          type: string
+          enum: [taken, missed, skipped]
+        takenAt:
+          type: string
+      required:
+        - id
+        - reminderId
+        - date
+        - status
+        - takenAt
+
+    Reminder:
+      type: object
+      properties:
+        id:
+          type: integer
+        medicationName:
+          type: string
+        dosage:
+          type: string
+        time:
+          type: string
+        days:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        notes:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - medicationName
+        - dosage
+        - time
+        - days
+        - isActive
+        - createdAt
+
+    CreateReminderInput:
+      type: object
+      properties:
+        medicationName:
+          type: string
+        dosage:
+          type: string
+        time:
+          type: string
+        days:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        notes:
+          type: string
+      required:
+        - medicationName
+        - dosage
+        - time
+        - days
+
+    FamilyContact:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        relationship:
+          type: string
+        isPrimary:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - phone
+        - relationship
+        - isPrimary
+        - createdAt
+
+    CreateFamilyContactInput:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        relationship:
+          type: string
+        isPrimary:
+          type: boolean
+      required:
+        - name
+        - phone
+        - relationship
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [no_movement, emergency, medication_missed, fall_detected, vital_alert, nurse_call]
+        message:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        isResolved:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - type
+        - message
+        - severity
+        - isResolved
+        - createdAt
+
+    CreateAlertInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [no_movement, emergency, medication_missed, fall_detected, vital_alert, nurse_call]
+        message:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+      required:
+        - type
+        - message
+        - severity
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum: [heart_rate, motion_sensor, fall_detector, blood_pressure, blood_sugar, smartwatch, oxygen_saturation, temperature]
+        isConnected:
+          type: boolean
+        lastSeen:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - type
+        - isConnected
+        - createdAt
+
+    CreateDeviceInput:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [heart_rate, motion_sensor, fall_detector, blood_pressure, blood_sugar, smartwatch, oxygen_saturation, temperature]
+      required:
+        - name
+        - type
+
+    DeviceReading:
+      type: object
+      properties:
+        id:
+          type: integer
+        deviceId:
+          type: integer
+        value:
+          type: number
+        unit:
+          type: string
+        recordedAt:
+          type: string
+      required:
+        - id
+        - deviceId
+        - value
+        - unit
+        - recordedAt

@@ -1,0 +1,1 @@
+- [Orval compatibility](orval-compatibility.md) — preserve React Query v5 output and check generated Zod code against the workspace’s Zod major.

@@ -1,0 +1,21 @@
+packages:
+  "framer-motion": "Smooth animations and page transitions for an elegant feel"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility to safely merge Tailwind CSS classes"
+  "lucide-react": "Beautiful consistent icons"
+
+images:
+  - path: "artifacts/senior-companion/public/images/hero-bg.png"
+    description: "Soft, warm, abstract gradient mesh in calming teal, sand, and cream colors, very subtle and soothing, suitable for elderly care app background"
+    aspect_ratio: "16:9"
+  - path: "artifacts/senior-companion/public/images/avatar-elderly.png"
+    description: "Friendly, gentle 3D illustrated avatar of a smiling senior person, warm colors, transparent background"
+    aspect_ratio: "1:1"
+  - path: "artifacts/senior-companion/public/images/device-abstract.png"
+    description: "Abstract, soft 3D illustration of smart health tracking devices (watch, heart icon) in a calming, friendly style, not overly technical"
+    aspect_ratio: "16:9"
+
+notes:
+  - Application uses RTL (Right-to-Left) layout for Arabic language
+  - Wrapping generated orval hooks in src/hooks to handle automatic query invalidation
+  - Using logical CSS properties (ms-, me-, ps-, pe-) for RTL compatibility
